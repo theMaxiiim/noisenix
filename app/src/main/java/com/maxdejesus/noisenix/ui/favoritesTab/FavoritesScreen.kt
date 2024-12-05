@@ -15,6 +15,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.foundation.Image
+import com.maxdejesus.noisenix.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,12 +34,20 @@ fun FavoritesScreen() {
     )
     val coroutineScope = rememberCoroutineScope()
 
+    val isTooltipVisible = remember { mutableStateOf(false) }
+
+    val bottomSheetContent = remember { mutableStateOf("Default content for the bottom sheet.") }
+    val bottomSheetImageResId = remember { mutableStateOf<Int?>(null) }
+
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetContent = {
-            BottomSheetContent()
+            BottomSheetContent(
+                content = bottomSheetContent.value,
+                imageResId = bottomSheetImageResId.value
+            )
         },
-        sheetPeekHeight = 80.dp, // Adjust the peek height as needed
+        sheetPeekHeight = 80.dp,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         content = { paddingValues ->
@@ -45,16 +61,17 @@ fun FavoritesScreen() {
                     title = { Text("Favorites") }
                 )
 
-                // Search Bar
                 SearchBar()
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Large Buttons
                 LargeButton(
                     text = "Trabant",
                     color = Color(0xFFE12B56),
                     onClick = {
+                        bottomSheetContent.value = "DAY AVG DB: 33.7\nWEEK AVG DB: 35.8\n" +
+                                "NUMBER OF SUBS (LAST 7 DAYS): 44"
+                        bottomSheetImageResId.value = R.drawable.trabant_image
                         coroutineScope.launch {
                             sheetState.bottomSheetState.expand()
                         }
@@ -65,6 +82,9 @@ fun FavoritesScreen() {
                     text = "Gore Hall",
                     color = Color(0xFFFFDE75),
                     onClick = {
+                        bottomSheetContent.value = "DAY AVG DB: 23.4\nWEEK AVG DB: 22.5\n" +
+                                "NUMBER OF SUBS (LAST 7 DAYS): 36"
+                        bottomSheetImageResId.value = R.drawable.gore_hall_image
                         coroutineScope.launch {
                             sheetState.bottomSheetState.expand()
                         }
@@ -75,6 +95,9 @@ fun FavoritesScreen() {
                     text = "Memorial Hall",
                     color = Color(0xFFBCE051),
                     onClick = {
+                        bottomSheetContent.value = "DAY AVG DB: 19.5\nWEEK AVG DB: 18.0\n" +
+                                "NUMBER OF SUBS (LAST 7 DAYS): 32"
+                        bottomSheetImageResId.value = R.drawable.memorial_image
                         coroutineScope.launch {
                             sheetState.bottomSheetState.expand()
                         }
@@ -85,6 +108,9 @@ fun FavoritesScreen() {
                     text = "Morris Library",
                     color = Color(0xFFBCE051),
                     onClick = {
+                        bottomSheetContent.value = "DAY AVG DB: 9.8\nWEEK AVG DB: 10.4\n" +
+                                "NUMBER OF SUBS (LAST 7 DAYS): 28"
+                        bottomSheetImageResId.value = R.drawable.morris_image
                         coroutineScope.launch {
                             sheetState.bottomSheetState.expand()
                         }
@@ -92,9 +118,54 @@ fun FavoritesScreen() {
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                // Tooltip Icon
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(16.dp)
+                        .clickable { isTooltipVisible.value = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Help,
+                        contentDescription = "Help Icon",
+                        modifier = Modifier.size(40.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Tooltip Dialog
+            if (isTooltipVisible.value) {
+                TooltipDialog(
+                    onDismiss = { isTooltipVisible.value = false },
+                    text = "Red Indicates High Noise Levels, Green Indicates Low Noise Levels" +
+                    ". Click On Any Location To View More Details."
+                )
             }
         }
     )
+}
+@Composable
+fun TooltipDialog(onDismiss: () -> Unit, text: String) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = text, style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = onDismiss) {
+                    Text("Close")
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,27 +224,35 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
 }
 
 @Composable
-fun BottomSheetContent() {
+fun BottomSheetContent(content: String, imageResId: Int?) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val maxHeight = screenHeight * 0.65f // 65% of screen height
+    val maxHeight = screenHeight * 0.65f
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 0.dp, max = maxHeight)
-            .padding(24.dp) // Increased padding
+            .padding(24.dp)
     ) {
-        // Removed custom drag handle
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Content of the bottom sheet
+        imageResId?.let {
+            val painter = painterResource(id = it)
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         Text(
-            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                    "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            style = MaterialTheme.typography.bodyLarge, // Increased text size
+            text = content,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
     }
