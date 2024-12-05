@@ -1,7 +1,9 @@
 package com.maxdejesus.noisenix.ui.favoritesTab
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -10,11 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,25 +30,25 @@ fun FavoritesScreen() {
     )
     val coroutineScope = rememberCoroutineScope()
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val topPadding = screenHeight * 0.1f // 10% of screen height
+
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetContent = {
             BottomSheetContent()
         },
-        sheetPeekHeight = 80.dp, // Adjust the peek height as needed
+        sheetPeekHeight = 80.dp,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
+                    .padding(top = topPadding)
                     .fillMaxSize()
             ) {
-                // Top App Bar
-                TopAppBar(
-                    title = { Text("Favorites") }
-                )
-
                 // Search Bar
                 SearchBar()
 
@@ -54,41 +58,25 @@ fun FavoritesScreen() {
                 LargeButton(
                     text = "Trabant",
                     color = Color(0xFFE12B56),
-                    onClick = {
-                        coroutineScope.launch {
-                            sheetState.bottomSheetState.expand()
-                        }
-                    }
+                    onClick = { /* No action needed */ }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LargeButton(
                     text = "Gore Hall",
                     color = Color(0xFFFFDE75),
-                    onClick = {
-                        coroutineScope.launch {
-                            sheetState.bottomSheetState.expand()
-                        }
-                    }
+                    onClick = { /* No action needed */ }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LargeButton(
                     text = "Memorial Hall",
                     color = Color(0xFFBCE051),
-                    onClick = {
-                        coroutineScope.launch {
-                            sheetState.bottomSheetState.expand()
-                        }
-                    }
+                    onClick = { /* No action needed */ }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LargeButton(
                     text = "Morris Library",
                     color = Color(0xFFBCE051),
-                    onClick = {
-                        coroutineScope.launch {
-                            sheetState.bottomSheetState.expand()
-                        }
-                    }
+                    onClick = { /* No action needed */ }
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -101,8 +89,7 @@ fun FavoritesScreen() {
 @Composable
 fun SearchBar() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         TextField(
@@ -113,11 +100,17 @@ fun SearchBar() {
                 .fillMaxWidth(0.8f)
                 .clip(RoundedCornerShape(16.dp)),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = Color.LightGray,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
+                autoCorrect = false,
+                capitalization = KeyboardCapitalization.None
+            )
         )
     }
 }
@@ -127,10 +120,11 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = color),
+        border = BorderStroke(2.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .height(60.dp),
+            .height(70.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -140,7 +134,7 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
         ) {
             Text(
                 text = text,
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 color = Color.Black
             )
             Icon(
@@ -156,15 +150,15 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
 fun BottomSheetContent() {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val maxHeight = screenHeight * 0.65f // 65% of screen height
+    val maxHeight = screenHeight * 0.65f
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 0.dp, max = maxHeight)
-            .padding(24.dp) // Increased padding
+            .padding(24.dp)
     ) {
-        // Removed custom drag handle
+        // Default drag handle will be used
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -173,7 +167,7 @@ fun BottomSheetContent() {
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                     "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
                     "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            style = MaterialTheme.typography.bodyLarge, // Increased text size
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
     }
