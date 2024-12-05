@@ -1,7 +1,9 @@
 package com.maxdejesus.noisenix.ui.favoritesTab
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -10,8 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -39,6 +44,10 @@ fun FavoritesScreen() {
     val bottomSheetContent = remember { mutableStateOf("Default content for the bottom sheet.") }
     val bottomSheetImageResId = remember { mutableStateOf<Int?>(null) }
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val topPadding = screenHeight * 0.1f // 10% of screen height
+
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetContent = {
@@ -54,6 +63,7 @@ fun FavoritesScreen() {
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
+                    .padding(top = topPadding)
                     .fillMaxSize()
             ) {
                 // Top App Bar
@@ -61,6 +71,7 @@ fun FavoritesScreen() {
                     title = { Text("Favorites") }
                 )
 
+                // Search Bar
                 SearchBar()
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -172,8 +183,7 @@ fun TooltipDialog(onDismiss: () -> Unit, text: String) {
 @Composable
 fun SearchBar() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         TextField(
@@ -184,11 +194,17 @@ fun SearchBar() {
                 .fillMaxWidth(0.8f)
                 .clip(RoundedCornerShape(16.dp)),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = Color.LightGray,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
+                autoCorrect = false,
+                capitalization = KeyboardCapitalization.None
+            )
         )
     }
 }
@@ -198,10 +214,11 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = color),
+        border = BorderStroke(2.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .height(60.dp),
+            .height(70.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -211,7 +228,7 @@ fun LargeButton(text: String, color: Color, onClick: () -> Unit) {
         ) {
             Text(
                 text = text,
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 color = Color.Black
             )
             Icon(
@@ -235,7 +252,8 @@ fun BottomSheetContent(content: String, imageResId: Int?) {
             .heightIn(min = 0.dp, max = maxHeight)
             .padding(24.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        // Default drag handle will be used
+//      //Spacer(modifier = Modifier.height(16.dp))
 
         imageResId?.let {
             val painter = painterResource(id = it)

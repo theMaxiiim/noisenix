@@ -63,6 +63,14 @@ dependencies {
     // Coroutine support
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+    // Google Maps Compose
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    // Play Services Maps
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
+
+
     // Unit testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
