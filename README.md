@@ -21,10 +21,9 @@ Instructions:
 
 How to Run the App
 Clone this repository:
-bash
-Copy code
+
 git clone <https://github.com/theMaxiiim/noisenix.git>
+
 Open the project in Android Studio.
 Connect an Android device or start an emulator.
 Build and run the app on the target device.
-
