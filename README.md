@@ -16,3 +16,15 @@ Monitor Noise Levels: View live noise readings and trends in real time.
 Explore Heatmaps: Use the interactive map to find noise hot spots in your area.
 Analyze Data: Access historical data to identify patterns and insights.
 Set Alerts: Customize noise thresholds and get notified when limits are breached.
+
+Instructions:
+
+How to Run the App
+Clone this repository:
+bash
+Copy code
+git clone <https://github.com/theMaxiiim/noisenix.git>
+Open the project in Android Studio.
+Connect an Android device or start an emulator.
+Build and run the app on the target device.
+
