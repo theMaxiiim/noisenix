@@ -1,9 +1,12 @@
 package com.maxdejesus.noisenix.ui.favoritesTab
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -15,22 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import kotlinx.coroutines.launch
+import com.maxdejesus.noisenix.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen() {
     val expandedItem = remember { mutableStateOf<String?>(null) }
-    val locations = listOf("Trabant", "Gore Hall", "Memorial Hall", "Morris Library")
+    val locations = listOf("Trabant", "Gore Hall", "Morris Library", "Memorial Hall")
     val isTooltipVisible = remember { mutableStateOf(false) }
 
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(initialValue = SheetValue.PartiallyExpanded)
     )
-    val coroutineScope = rememberCoroutineScope()
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
@@ -112,20 +115,93 @@ fun FavoritesScreen() {
 
 @Composable
 fun BottomSheetContent() {
+    // Define noise levels for each location
+    val noiseLevels = mapOf(
+        "Trabant" to 0.7f,
+        "Gore Hall" to 0.5f,
+        "Memorial Hall" to 0.1f,
+        "Morris Library" to 0.3f
+    )
+
+    // Sort locations by noise level (ascending)
+    val sortedLocations = noiseLevels.entries.sortedBy { it.value }
+
+    // Create rankings
+    val rankings = sortedLocations.mapIndexed { index, entry ->
+        Triple(entry.key, entry.value, index + 1) // Triple(Location, NoiseLevel, Rank)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
+        // Title with a blue line
         Text(
             text = "Quietness Rankings",
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Text(
-            text = "This sheet can hold additional information or actions related to the current screen.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        HorizontalDivider(color = Color.Blue, thickness = 2.dp)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Horizontal Scrollable Rankings
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            rankings.forEach { (location, noiseLevel, rank) ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .width(150.dp) // Adjust width for larger items
+                ) {
+                    // Load images directly from the drawable directory
+                    val imageResource = when (location) {
+                        "Trabant" -> R.drawable.trabant_image
+                        "Gore Hall" -> R.drawable.gore_hall_image
+                        "Memorial Hall" -> R.drawable.memorial_image
+                        "Morris Library" -> R.drawable.morris_image
+                        else -> R.drawable.ic_launcher_foreground // Default placeholder
+                    }
+
+                    // Display image
+                    Image(
+                        painter = painterResource(id = imageResource),
+                        contentDescription = "$location Image",
+                        modifier = Modifier
+                            .size(140.dp) // Increased image size
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.LightGray)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Location details
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = "Quietness Score: %.1f".format(noiseLevel),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = "${rank} Place",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
     }
 }
 
