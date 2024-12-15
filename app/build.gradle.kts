@@ -69,4 +69,8 @@ dependencies {
     // For coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+    implementation ("androidx.compose.material3:material3:1.0.1")
+    implementation ("androidx.compose.ui:ui:1.4.0-beta01")
+    implementation ("androidx.navigation:navigation-compose:2.5.3")
+
 }

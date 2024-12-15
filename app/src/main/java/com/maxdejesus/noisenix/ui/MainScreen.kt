@@ -6,15 +6,17 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.sharp.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.maxdejesus.noisenix.ui.favoritesTab.FavoritesScreen
 import com.maxdejesus.noisenix.ui.mapTab.MapScreen
+import com.maxdejesus.noisenix.ui.loginScreen.LoginScreen
+import com.maxdejesus.noisenix.ui.phoneNumberScreen.PhoneNumberScreen
 
 @Composable
 fun MainScreen() {
@@ -22,14 +24,36 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            if (shouldShowBottomBar(navController)) {
+                BottomNavigationBar(navController = navController)
+            }
         }
     ) { innerPadding ->
-        MainNavGraph(
+        NavHost(
             navController = navController,
+            startDestination = "prelogin",
             modifier = Modifier.padding(innerPadding)
-        )
+        ) {
+            composable("prelogin") {
+                PhoneNumberScreen(navController = navController)
+            }
+            composable("login") {
+                LoginScreen(navController = navController)
+            }
+            composable(BottomNavItem.Favorites.route) {
+                FavoritesScreen()
+            }
+            composable(BottomNavItem.Map.route) {
+                MapScreen()
+            }
+        }
     }
+}
+
+@Composable
+fun shouldShowBottomBar(navController: NavHostController): Boolean {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    return currentBackStackEntry?.destination?.route !in listOf("prelogin", "login")
 }
 
 @Composable
@@ -37,7 +61,6 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Favorites,
         BottomNavItem.Map
-
     )
     NavigationBar(
         containerColor = Color.White,
@@ -49,13 +72,10 @@ fun BottomNavigationBar(navController: NavHostController) {
                 selected = currentDestination?.route == item.route,
                 onClick = {
                     navController.navigate(item.route) {
-                        // Pop up to the start destination to avoid building up a large stack
-                        popUpTo(navController.graph.findStartDestination().id) {
+                        popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
-                        // Avoid multiple copies
                         launchSingleTop = true
-                        // Restore state
                         restoreState = true
                     }
                 },
@@ -76,24 +96,4 @@ fun BottomNavigationBar(navController: NavHostController) {
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val title: String) {
     object Favorites : BottomNavItem("favorites", Icons.Filled.Star, "Favorites")
     object Map : BottomNavItem("map", Icons.Sharp.Place, "Map")
-}
-
-@Composable
-fun MainNavGraph(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    NavHost(
-        navController = navController,
-        startDestination = BottomNavItem.Favorites.route,
-        modifier = modifier
-    ) {
-        composable(BottomNavItem.Favorites.route) {
-            FavoritesScreen()
-        }
-
-        composable(BottomNavItem.Map.route) {
-            MapScreen()
-        }
-    }
 }
