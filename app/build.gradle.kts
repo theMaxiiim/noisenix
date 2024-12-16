@@ -69,4 +69,8 @@ dependencies {
     // For coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+
+    implementation("com.google.maps.android:android-maps-utils:3.9.0")
+
+
 }
