@@ -1,5 +1,3 @@
-//Default SMS login: 147258
-
 package com.maxdejesus.noisenix.ui.loginScreen
 
 import androidx.compose.foundation.layout.*
@@ -45,11 +43,10 @@ fun LoginScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = numericInput,
                     onValueChange = { newValue ->
-                        if (newValue.all { it.isDigit() }) {
-                            numericInput = newValue
-                        }
+                        // Always filter to digits only, keeping the cursor naturally at the end.
+                        numericInput = newValue.filter { it.isDigit() }
                     },
-                    label = { Text("Enter numbers") },
+                    label = { Text("Enter code") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 24.dp),

@@ -194,7 +194,7 @@ fun BottomSheetContent() {
                         maxLines = 1
                     )
                     Text(
-                        text = "${rank} Place",
+                        text = "#${rank}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1
@@ -251,7 +251,7 @@ fun ExpandableLocationCard(
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Last Updated ~ 6 hours ago",
+                text = "Last Updated ~ 5 hours ago",
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
