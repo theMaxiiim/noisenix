@@ -74,5 +74,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
     implementation("com.google.maps.android:android-maps-utils:3.9.0")
+    implementation("io.github.gautamchibde:audiovisualizer:2.2.5")
+
 
 }
